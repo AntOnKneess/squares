@@ -67,6 +67,7 @@ while loop:
     screen.blit(update_fps(), (10,screen.get_height() * 0.97))
     if(Debug):
         pygame.draw.rect(screen, (255,0,0) , player.rectBottom, 3)
+        pygame.draw.rect(screen, (255,255,0) , player.rectLeft, 3)
         for i in collisions:
             pygame.draw.rect(screen, (0,255,0) , i.rect, 3)
     pygame.display.update()

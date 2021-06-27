@@ -12,7 +12,7 @@ class Player(pygame.sprite.Sprite):
         self.surf.fill((50, 50, 50))
         self.rect = self.surf.get_rect()
         self.rectBottom = pygame.Rect(x,y+(self.height / 2),25,3)
-        self.rectLeft = pygame.Rect(x-(self.width/2),y+(self.height / 2),25,3)
+        self.rectLeft = pygame.Rect(x-(self.width/2),y,3,25)
         self.image = self.surf
         self.grav = 0
         self.jump = 0
@@ -22,6 +22,7 @@ class Player(pygame.sprite.Sprite):
     def UpdateRects(self, cX, cY):
         self.rect.center = (self.x - cX, self.y - cY)
         self.rectBottom.center = (self.x - cX, self.y +(self.height / 2) - cY)
+        self.rectLeft.center = (self.x - (self.width/2) - cX, self.y - cY)
 
 
     def update(self, cX ,cY, collisions):
