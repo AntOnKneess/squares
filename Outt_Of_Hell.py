@@ -14,7 +14,9 @@ CamX, CamY = (0,0)
 allsprites = pygame.sprite.Group()
 collisions = pygame.sprite.Group()
 
-Debug = False
+
+floors = []
+Debugs = False
 
 def update_fps():
 
@@ -26,7 +28,41 @@ def update_fps():
 
     return TilesSurface
 
+def loadLevel(level):
+    f = open("Levels/" + str(level) +".txt", "r")
+    row = []
+    col = []
+    linecount = 0
+    rowlen = 0
+    for line in f:
+        if line != "\n":
+            linecount += 1
+            row = line.split(",")
+            for i in row:
+                rowlen = len(row)
+            col.append(row)
+    print(col)
+    print (len(col))
+    for y in range(linecount):
+        for x in range(rowlen):
+            if(col[y][x] == "1" or col[y][x] == "1\n"):
+                floors.append(platform.Platform(x=x*(w/(rowlen-1)), y=y*(h/(linecount - 1)), w= (w/(rowlen-1)), h = (h/(linecount - 1))))
+    for i in floors:
+        allsprites.add(i)
+        collisions.add(i)
 
+
+def TestWorld():
+    floor1 = platform.Platform(x=720, y =950, w=1250, h=125)
+    collisions.add(floor1)
+    allsprites.add(floor1)
+    floor2 = platform.Platform(x=720, y =500, w=75, h=600)
+    collisions.add(floor2)
+    allsprites.add(floor2)
+         
+    
+loadLevel(1)
+#TestWorld()
 
 
 def renders():
@@ -37,12 +73,6 @@ player = player.Player(x= 90, y= 255)
 allsprites.add(player)
 
 
-floor = platform.Platform(x= 525, y =900, w= 1000, h=100)
-floor2 = platform.Platform(x = 540, y= 580, w= 100, h = 400)
-allsprites.add(floor)
-allsprites.add(floor2)
-collisions.add(floor2)
-collisions.add(floor)
 
 
 def Debug():
@@ -54,6 +84,11 @@ def Debug():
         pygame.draw.rect(screen, (255,255,255) , player.rectLeft, 3)
     else:
         pygame.draw.rect(screen, (255,255,0) , player.rectLeft, 3)
+    if(player.RightWall):
+        pygame.draw.rect(screen, (255,255,255) , player.rectRight, 3)
+    else:
+        pygame.draw.rect(screen, (255,0,255) , player.rectRight, 3)
+    pygame.draw.rect(screen, (0,255,255) , player.rectTop, 3)
     for i in collisions:
         pygame.draw.rect(screen, (0,255,0) , i.rect, 3)
 
@@ -70,15 +105,15 @@ while loop:
             if event.key == pygame.K_ESCAPE:
                 loop = 0  
             if event.key == pygame.K_F1:
-                if Debug:
-                    Debug = False
+                if Debugs:
+                    Debugs = False
                 else:
-                    Debug = True
+                    Debugs = True
         if event.type == pygame.QUIT:
             loop = 0
     renders()
    
     screen.blit(update_fps(), (10,screen.get_height() * 0.97))
-    if(Debug):
+    if(Debugs == True):
         Debug()
     pygame.display.update()
