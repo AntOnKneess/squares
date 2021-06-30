@@ -111,21 +111,21 @@ loadLevel(1)
 
 def playerlogic():
     global screentransition, screentransitionFrame, CamX, level, foward
-    if(screentransition and screentransitionFrame < 60):
+    if(screentransition and screentransitionFrame < 30):
         player.canmove = False
         if(foward):        
             if(screentransitionFrame == 0):
                 loadFakeLevel(level + 1)
-            CamX += w/60 * deltaTime
+            CamX += w/30 * deltaTime
             screentransitionFrame += 1 * deltaTime
         else:
             if(screentransitionFrame == 0):
                 loadFakeLevel(level - 1)
-            CamX -= w/60 * deltaTime
+            CamX -= w/30 * deltaTime
             screentransitionFrame += 1 * deltaTime
 
 
-    elif(screentransitionFrame >= 60):
+    elif(screentransitionFrame >= 30):
 
         if(foward):
             level += 1

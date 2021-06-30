@@ -47,6 +47,64 @@ class Player(pygame.sprite.Sprite):
             if(par.frame > par.lifetime):
                 self.particlesArr.pop(pos-1)
 
+    def Physics(self, cX, cY, collisions):
+        for i in collisions:
+
+            
+
+            if(self.rectBottom.colliderect(i.rect)):
+                while(self.rectBottom.colliderect(i.rect)):
+                    self.y -= 0.1
+                    self.UpdateRects(cX, cY)
+                    self.momentumX = 0
+
+            if(self.rectLeft.colliderect(i.rect)):
+                self.jump = 0
+                self.grav = 0
+                self.momentumX = 0
+                while(self.rectLeft.colliderect(i.rect)):
+                    self.x += 0.1
+                    self.UpdateRects(cX, cY)
+                    self.wallJoin = True
+
+            if(self.rectRight.colliderect(i.rect)):
+                self.jump = 0
+                self.grav = 0
+                self.momentumX = 0
+                while(self.rectRight.colliderect(i.rect)):
+                    self.x -= 0.1
+                    self.UpdateRects(cX, cY)
+                    self.wallJoin = True
+
+            if(self.rectTop.colliderect(i.rect)):
+                self.jump = 0
+                self.grav = 0
+                self.momentumX = 0
+                while(self.rectTop.colliderect(i.rect)):
+                    self.y += 0.1
+                    self.UpdateRects(cX, cY)
+
+
+            self.rectBottom.center = (self.x - cX, self.y +(self.height / 2) + 0.1 - cY)
+            if(self.rectBottom.colliderect(i.rect)):
+                self.grav = 0
+                if(self.jump < 4):
+                    self.isground = True
+            self.UpdateRects(cX, cY)
+            
+            self.rectLeft.center = (self.x - cX - (self.width/2) - 0.1, self.y - cY)
+            if(self.rectLeft.colliderect(i.rect) and self.wallJoin):
+                self.LeftWall = True
+            
+            self.UpdateRects(cX, cY)
+
+            self.rectRight.center = (self.x - cX + (self.width/2) + 0.1, self.y - cY)
+            if(self.rectRight.colliderect(i.rect) and self.wallJoin):
+                self.RightWall = True
+            
+            self.UpdateRects(cX, cY)
+            
+
     def update(self, cX ,cY, collisions, delta):
         
 
@@ -63,11 +121,11 @@ class Player(pygame.sprite.Sprite):
                     if(self.LeftWall):
                         self.momentumX = 30 
                         self.jump = 4.5
-                        self.particlesArr.append(particles.Particles(x=self.x - 25, y=self.y - 75, direction=(270, 450)))
+                        self.particlesArr.append(particles.Particles(x=self.x - 27, y=self.y - 25, direction=(270, 450)))
                     elif(self.RightWall):
                         self.momentumX = -30
                         self.jump = 4.5
-                        self.particlesArr.append(particles.Particles(x=self.x + 5 , y=self.y -75, direction=(90, 270)))
+                        self.particlesArr.append(particles.Particles(x=self.x + 5 , y=self.y -25, direction=(90, 270)))
                     else:
                         self.jump = 5.5
                         self.isground = False
@@ -91,66 +149,13 @@ class Player(pygame.sprite.Sprite):
                 if(key[pygame.K_w]):
                     self.jump = 4
             
+        
         self.LeftWall = False
         self.RightWall = False
         self.isground = False
         
-        for i in collisions:
-
-            
-
-            if(self.rectBottom.colliderect(i.rect)):
-                while(self.rectBottom.colliderect(i.rect)):
-                    self.y -= 0.1
-                    self.UpdateRects(cX, cY)
-
-            if(self.rectLeft.colliderect(i.rect)):
-                self.jump = 0
-                self.grav = 0
-                self.momentumX = 0
-                while(self.rectLeft.colliderect(i.rect)):
-                    self.x += 0.1
-                    self.UpdateRects(cX, cY)
-                    self.wallJoin = True
-
-            if(self.rectRight.colliderect(i.rect)):
-                self.jump = 0
-                self.grav = 0
-                self.momentumX = 0
-                while(self.rectRight.colliderect(i.rect)):
-                    self.x -= 0.1
-                    self.UpdateRects(cX, cY)
-                    self.wallJoin = True
-
-            if(self.rectTop.colliderect(i.rect)):
-                self.jump = 0
-                self.grav = 0
-                while(self.rectTop.colliderect(i.rect)):
-                    self.y += 0.1
-                    self.UpdateRects(cX, cY)
-
-
-            self.rectBottom.center = (self.x - cX, self.y +(self.height / 2) + 0.1 - cY)
-            if(self.rectBottom.colliderect(i.rect)):
-                self.grav = 0
-                if(self.jump < 4):
-                    self.isground = True
-            self.UpdateRects(cX, cY)
-            
-            self.rectLeft.center = (self.x - cX - (self.width/2) - 0.1, self.y - cY)
-            if(self.rectLeft.colliderect(i.rect) and self.wallJoin):
-                self.LeftWall = True
-                self.dash = True
-            self.UpdateRects(cX, cY)
-
-            self.rectRight.center = (self.x - cX + (self.width/2) + 0.1, self.y - cY)
-            if(self.rectRight.colliderect(i.rect) and self.wallJoin):
-                self.RightWall = True
-                self.dash = True
-            self.UpdateRects(cX, cY)
-            
-
-                
+        
+        self.Physics(cX,cY,collisions)
             
             
         if(self.isground != True):
@@ -160,9 +165,9 @@ class Player(pygame.sprite.Sprite):
                 self.grav += 0.1
                 if(self.canslide): 
                     if(self.LeftWall):
-                        self.particlesArr.append(particles.Particles(x=self.x -27, y=self.y - 10, direction=(270, 360), density=10, lifetime=5, fade=20, color=(237, 107, 134), w=3,h=3))
+                        self.particlesArr.append(particles.Particles(x=self.x -27, y=self.y - 10, direction=(270, 360), density=10, lifetime=5, fade=20, color=(237, 107, 134), w=5,h=5))
                     else:
-                        self.particlesArr.append(particles.Particles(x=self.x + 27, y=self.y - 10, direction=(180, 270), density=10, lifetime=5, fade=20, color=(237, 107, 134), w=3,h=3))
+                        self.particlesArr.append(particles.Particles(x=self.x + 27, y=self.y - 10, direction=(180, 270), density=10, lifetime=5, fade=20, color=(237, 107, 134), w=5,h=5))
                 self.canslide = True
         else:
             self.wallJoin = False
@@ -174,13 +179,33 @@ class Player(pygame.sprite.Sprite):
         if(self.jump > 0):
             self.grav -= self.jump
             self.jump -= 1
+        if(self.momentumX < 0.001 and self.momentumX > -0.001):
+            self.momentumX = 0
         if(self.momentumX != 0):
-            self.x += self.momentumX * delta
-            self.momentumX /= 1.25   
-            if(self.momentumX > 1 or self.momentumX < -1):
-                self.particlesArr.append(particles.Particles(x=self.x - 25, y=self.y - 25, direction=(180, 270), density=10, lifetime=10, fade=10, color=(237, 107, 134), w=50,h=50, speed=0))
-        
-        self.y += self.grav * delta 
+            print("Mo X" + str(self.momentumX))
+            if(self.momentumX > 0):
+                for i in range (round(self.momentumX * delta)):
+                    self.x += 1                 
+                    if(round(self.x) % 7 == 0):
+                        self.Physics(cX,cY,collisions)
+            if(self.momentumX < 0):
+                for i in range (round(self.momentumX *-1 * delta)):
+                    self.x -= 1
+                    if(round(self.x) % 7 == 0):
+                        self.Physics(cX,cY,collisions)
+            self.momentumX /= 1.25
+            
+        if(self.grav * delta > 0):
+            for i in range (round(self.grav * delta)):
+                self.y += 1
+                if(round(self.y) % 5 == 0):
+                    self.Physics(cX,cY,collisions)
+        else:
+            for i in range (round(self.grav * delta * -1)):
+                self.y -= 1
+                if(round(self.y) % 5 == 0):
+                    self.Physics(cX,cY,collisions)
+         
         self.UpdateRects(cX, cY)
 
 
