@@ -6,11 +6,11 @@ class Platform(pygame.sprite.Sprite):
         self.x = x
         self.y = y
         self.surf = pygame.Surface((w, h))
-        self.surf.fill((100, 100, 50))
+        self.surf.fill((237, 107, 134))
         self.rect = self.surf.get_rect()
         self.image = self.surf
 
-    def update(self, cX ,cY, collisions):
+    def update(self, cX ,cY, collisions, delta):
         
         self.rect.center = (self.x - cX, self.y -cY)
         

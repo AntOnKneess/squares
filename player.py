@@ -1,7 +1,7 @@
-import pygame 
+import pygame,particles
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, x=0, y=0, speed = 10):
+    def __init__(self, x=0, y=0, speed = 10, screen = ""):
         super().__init__()
         self.x = x
         self.y = y
@@ -9,7 +9,7 @@ class Player(pygame.sprite.Sprite):
         self.height =  50
         self.speed = speed
         self.surf = pygame.Surface((self.width, self.height))
-        self.surf.fill((50, 50, 50))
+        self.surf.fill((3, 206, 164))
         self.rect = self.surf.get_rect()
         self.rectBottom = pygame.Rect(x,y+(self.height / 2),30,1)
         self.rectLeft = pygame.Rect(x-(self.width/2),y,1,10)
@@ -24,6 +24,12 @@ class Player(pygame.sprite.Sprite):
         self.wallJoin = False
         self.momentumX = 0
         self.dash = True
+        self.particlesArr = []
+        self.screen = screen
+        self.canslide = True
+        self.level = 0
+        self.canmove = True
+
 
     def UpdateRects(self, cX, cY):
         self.rect.center = (self.x - cX, self.y - cY)
@@ -33,45 +39,57 @@ class Player(pygame.sprite.Sprite):
         self.rectTop.center = (self.x - cX, self.y -(self.height / 2) - cY)
 
         
+    def particles(self, delta):
+        pos = 0
+        for par in self.particlesArr:
+            pos+=1
+            self.screen.blit(par.update(delta), (par.x -250, par.y -250))
+            if(par.frame > par.lifetime):
+                self.particlesArr.pop(pos-1)
 
+    def update(self, cX ,cY, collisions, delta):
+        
 
-    def update(self, cX ,cY, collisions):
-        
-        
-     
+        self.particles(delta)
         key = pygame.key.get_pressed()
-        if(key[pygame.K_w]):
-            if(self.isground or self.LeftWall or self.RightWall):
-                
-               
-                self.grav = 0
-                self.wallJoin = False
-                if(self.LeftWall):
-                    self.momentumX = 30 
-                    self.jump = 4.5
-                elif(self.RightWall):
-                    self.momentumX = -30
-                    self.jump = 4.5
-                else:
-                     self.jump = 5.5
+        if(self.canmove):
+            if(key[pygame.K_w]):
+                if(self.isground or self.LeftWall or self.RightWall):
+                    
+                    pygame.mixer.Sound("SFX/Jump.wav").play()
+                    self.grav = 0
+                    self.wallJoin = False
+                    self.canslide = False
+                    if(self.LeftWall):
+                        self.momentumX = 30 
+                        self.jump = 4.5
+                        self.particlesArr.append(particles.Particles(x=self.x - 25, y=self.y - 75, direction=(270, 450)))
+                    elif(self.RightWall):
+                        self.momentumX = -30
+                        self.jump = 4.5
+                        self.particlesArr.append(particles.Particles(x=self.x + 5 , y=self.y -75, direction=(90, 270)))
+                    else:
+                        self.jump = 5.5
+                        self.isground = False
+                        self.particlesArr.append(particles.Particles(x=self.x, y=self.y + 10, direction=(180, 360)))
            
 
-        if(key[pygame.K_s]):
-            self.y += 1 * self.speed
-        if(key[pygame.K_a]):
-            if(self.LeftWall == False):
-                self.x -= 1 * self.speed
-        if(key[pygame.K_d]):
-            if(self.RightWall == False):
-                self.x += 1 * self.speed
-        if(key[pygame.K_SPACE] and self.dash):
-            self.dash = False
-            if(key[pygame.K_d]):
-                self.momentumX += 50
+            if(key[pygame.K_s]):
+                self.y += 1 * self.speed * delta
             if(key[pygame.K_a]):
-                self.momentumX += -50
-            if(key[pygame.K_w]):
-                self.jump = 4
+                if(self.LeftWall == False):
+                    self.x -= 1 * self.speed * delta
+            if(key[pygame.K_d]):
+                if(self.RightWall == False):
+                    self.x += 1 * self.speed * delta
+            if(key[pygame.K_SPACE] and self.dash and self.isground == False):
+                self.dash = False
+                if(key[pygame.K_d]):
+                    self.momentumX += 50
+                if(key[pygame.K_a]):
+                    self.momentumX += -50
+                if(key[pygame.K_w]):
+                    self.jump = 4
             
         self.LeftWall = False
         self.RightWall = False
@@ -115,7 +133,8 @@ class Player(pygame.sprite.Sprite):
             self.rectBottom.center = (self.x - cX, self.y +(self.height / 2) + 0.1 - cY)
             if(self.rectBottom.colliderect(i.rect)):
                 self.grav = 0
-                self.isground = True
+                if(self.jump < 4):
+                    self.isground = True
             self.UpdateRects(cX, cY)
             
             self.rectLeft.center = (self.x - cX - (self.width/2) - 0.1, self.y - cY)
@@ -139,6 +158,12 @@ class Player(pygame.sprite.Sprite):
                 self.grav += 0.75
             else:
                 self.grav += 0.1
+                if(self.canslide): 
+                    if(self.LeftWall):
+                        self.particlesArr.append(particles.Particles(x=self.x -27, y=self.y - 10, direction=(270, 360), density=10, lifetime=5, fade=20, color=(237, 107, 134), w=3,h=3))
+                    else:
+                        self.particlesArr.append(particles.Particles(x=self.x + 27, y=self.y - 10, direction=(180, 270), density=10, lifetime=5, fade=20, color=(237, 107, 134), w=3,h=3))
+                self.canslide = True
         else:
             self.wallJoin = False
             self.dash = True
@@ -150,10 +175,12 @@ class Player(pygame.sprite.Sprite):
             self.grav -= self.jump
             self.jump -= 1
         if(self.momentumX != 0):
-            self.x += self.momentumX
+            self.x += self.momentumX * delta
             self.momentumX /= 1.25   
+            if(self.momentumX > 1 or self.momentumX < -1):
+                self.particlesArr.append(particles.Particles(x=self.x - 25, y=self.y - 25, direction=(180, 270), density=10, lifetime=10, fade=10, color=(237, 107, 134), w=50,h=50, speed=0))
         
-        self.y += self.grav
+        self.y += self.grav * delta 
         self.UpdateRects(cX, cY)
 
 
