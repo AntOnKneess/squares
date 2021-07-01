@@ -25,6 +25,7 @@ class Player(pygame.sprite.Sprite):
         self.momentumX = 0
         self.dash = True
         self.particlesArr = []
+        self.trailArr = []
         self.screen = screen
         self.canslide = True
         self.level = 0
@@ -46,6 +47,12 @@ class Player(pygame.sprite.Sprite):
             self.screen.blit(par.update(delta), (par.x -250, par.y -250))
             if(par.frame > par.lifetime):
                 self.particlesArr.pop(pos-1)
+        pos = 0
+        for tar in self.trailArr:
+            pos+=1
+            self.screen.blit(tar.update(delta,self.x-25,self.y-25), (0,0))
+            if(tar.frame > tar.lifetime):
+                self.trailArr.pop(pos-1)
 
     def Physics(self, cX, cY, collisions):
         for i in collisions:
@@ -142,12 +149,14 @@ class Player(pygame.sprite.Sprite):
                     self.x += 1 * self.speed * delta
             if(key[pygame.K_SPACE] and self.dash and self.isground == False):
                 self.dash = False
+                self.trailArr.append(particles.Trail(x=self.x, y=self.y, roundness=3,color=(237, 107, 134), w=50, h=50))
                 if(key[pygame.K_d]):
                     self.momentumX += 50
                 if(key[pygame.K_a]):
                     self.momentumX += -50
                 if(key[pygame.K_w]):
-                    self.jump = 4
+                    self.grav = 0
+                    self.jump = 6
             
         
         self.LeftWall = False
@@ -194,6 +203,7 @@ class Player(pygame.sprite.Sprite):
                     if(round(self.x) % 7 == 0):
                         self.Physics(cX,cY,collisions)
             self.momentumX /= 1.25
+            
             
         if(self.grav * delta > 0):
             for i in range (round(self.grav * delta)):
