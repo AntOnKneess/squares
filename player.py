@@ -174,9 +174,9 @@ class Player(pygame.sprite.Sprite):
                 self.grav += 0.1
                 if(self.canslide): 
                     if(self.LeftWall):
-                        self.particlesArr.append(particles.Particles(x=self.x -27, y=self.y - 10, direction=(270, 360), density=10, lifetime=5, fade=20, color=(237, 107, 134), w=5,h=5))
+                        self.particlesArr.append(particles.Particles(x=self.x -27, y=self.y - 10, direction=(270, 360), density=15, lifetime=5, fade=20, color=(237, 107, 134), w=8,h=8))
                     else:
-                        self.particlesArr.append(particles.Particles(x=self.x + 27, y=self.y - 10, direction=(180, 270), density=10, lifetime=5, fade=20, color=(237, 107, 134), w=5,h=5))
+                        self.particlesArr.append(particles.Particles(x=self.x + 27, y=self.y - 10, direction=(180, 270), density=15, lifetime=5, fade=20, color=(237, 107, 134), w=8,h=8))
                 self.canslide = True
         else:
             self.wallJoin = False

@@ -65,6 +65,8 @@ def loadLevel(level):
         for x in range(rowlen):
             if(col[y][x] == "1" or col[y][x] == "1\n"):
                 floors.append(platform.Platform(x=x*(w/(rowlen-1)), y=y*(h/(linecount - 1)), w= (w/(rowlen-1)) + 1, h = (h/(linecount - 1)) + 1))
+            if(col[y][x] == "2" or col[y][x] == "2\n"):
+                floors.append(platform.Spike(x=x*(w/(rowlen-1)), y=y*(h/(linecount - 1)), w= (w/(rowlen-1)) + 1, h = (h/(linecount - 1)) + 1))
     for i in floors:
         allLevelsprites.add(i)
         collisions.add(i)
@@ -101,6 +103,8 @@ def loadFakeLevel(level):
         for x in range(rowlen):
             if(col[y][x] == "1" or col[y][x] == "1\n"):
                 fakefloors.append(platform.Platform(x=x*(w/(rowlen-1)), y=y*(h/(linecount - 1)), w= (w/(rowlen-1)) + 1, h = (h/(linecount - 1)) + 1))
+            if(col[y][x] == "2" or col[y][x] == "2\n"):
+                fakefloors.append(platform.Spike(x=x*(w/(rowlen-1)), y=y*(h/(linecount - 1)), w= (w/(rowlen-1)) + 1, h = (h/(linecount - 1)) + 1))
     for i in fakefloors:
         fakeLevel.add(i)
 
@@ -140,10 +144,10 @@ def playerlogic():
         fakeLevel.empty()
         CamX=0
         print("yes!")
-    if(player.x > w - 10):
+    if(player.x > w - 1):
         foward = True
         screentransition = True
-    if(player.x < 2 ):
+    if(player.x < 1 ):
         foward = False
         screentransition = True
 
